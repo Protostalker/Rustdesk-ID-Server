@@ -67,21 +67,9 @@ export default function DeviceCard({ device, onOpen, launchEnabled, onToast }) {
           Connect
         </button>
         <CopyButton
-          value={connectUrl}
-          label="Copy Link"
-          onCopied={() => onToast?.('Connect link copied')}
-          disabled={!device.rustdesk_id}
-        />
-        <CopyButton
           value={device.rustdesk_id}
           label="Copy ID"
           onCopied={() => onToast?.('RustDesk ID copied')}
-          disabled={!device.rustdesk_id}
-        />
-        <CopyButton
-          value={device.rustdesk_id ? `RustDesk ID: ${device.rustdesk_id}${device.nickname ? ` (${device.nickname})` : ''}` : null}
-          label="Copy note"
-          onCopied={() => onToast?.('Connect note copied')}
           disabled={!device.rustdesk_id}
         />
         {launchEnabled && (

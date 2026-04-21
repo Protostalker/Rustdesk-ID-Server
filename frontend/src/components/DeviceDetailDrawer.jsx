@@ -127,12 +127,6 @@ export default function DeviceDetailDrawer({ device, companies, onClose, onChang
               disabled={!device.rustdesk_id}
               title={device.rustdesk_id ? `Open RustDesk and connect to ${device.rustdesk_id}` : 'Invalid ID'}
             >Connect</button>
-            <CopyButton
-              value={rustdeskConnectUrl(device.rustdesk_id)}
-              label="Copy Link"
-              onCopied={() => onToast?.('Connect link copied')}
-              disabled={!device.rustdesk_id}
-            />
             <CopyButton value={device.rustdesk_id} label="Copy ID" onCopied={() => onToast?.('Copied')} disabled={!device.rustdesk_id} />
             <button className="btn danger" onClick={remove}>Delete</button>
           </div>

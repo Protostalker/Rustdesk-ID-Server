@@ -28,9 +28,7 @@ exposes a clean internal-admin web UI.
 - **One-click Connect** — each device has a `Connect` button that
   opens the locally installed RustDesk client and begins a new
   connection via the `rustdesk://connection/new/<ID>` deep link.
-  Verified on Windows. A `Copy Link` button is provided for cases
-  where you want to paste the deep link into chat, a ticket, or
-  another tool.
+  Verified on Windows.
 - Legacy feature flag for an older launch scheme (`rustdesk://<id>`).
   Off by default and superseded by the Connect button above.
 
@@ -193,10 +191,6 @@ install time, and clicking Connect opens the client and starts a new
 session against the given peer. On platforms without the handler
 registered, clicking the button is a harmless no-op — no network
 traffic, no error — so it is safe to ship unconditionally.
-
-The companion button **Copy Link** copies the exact same URL to the
-clipboard so you can paste it into a Slack/Teams/ticket/email and the
-other end can click to connect directly.
 
 Notes:
 
