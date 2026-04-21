@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '../api.js'
 import CopyButton from './CopyButton.jsx'
+import { rustdeskConnectUrl } from './DeviceCard.jsx'
 
 const MAX_COMPANIES = 2
 
@@ -115,7 +116,24 @@ export default function DeviceDetailDrawer({ device, companies, onClose, onChang
 
           <div className="row" style={{ marginBottom: 16 }}>
             <button className="btn primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
-            <CopyButton value={device.rustdesk_id} label="Copy ID" onCopied={() => onToast?.('Copied')} />
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                const url = rustdeskConnectUrl(device.rustdesk_id)
+                if (!url) return
+                try { window.location.href = url } catch {}
+              }}
+              disabled={!device.rustdesk_id}
+              title={device.rustdesk_id ? `Open RustDesk and connect to ${device.rustdesk_id}` : 'Invalid ID'}
+            >Connect</button>
+            <CopyButton
+              value={rustdeskConnectUrl(device.rustdesk_id)}
+              label="Copy Link"
+              onCopied={() => onToast?.('Connect link copied')}
+              disabled={!device.rustdesk_id}
+            />
+            <CopyButton value={device.rustdesk_id} label="Copy ID" onCopied={() => onToast?.('Copied')} disabled={!device.rustdesk_id} />
             <button className="btn danger" onClick={remove}>Delete</button>
           </div>
 

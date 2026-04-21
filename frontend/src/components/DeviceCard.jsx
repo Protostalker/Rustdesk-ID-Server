@@ -1,6 +1,13 @@
 import React from 'react'
 import CopyButton from './CopyButton.jsx'
 
+// RustDesk's Windows client registers this URL scheme. Clicking such a link
+// opens the local RustDesk app and initiates a new connection to the given ID.
+// Verified working on Windows; harmless no-op on hosts without the handler.
+export function rustdeskConnectUrl(id) {
+  return id ? `rustdesk://connection/new/${id}` : null
+}
+
 function formatLastSeen(iso) {
   if (!iso) return '—'
   try {
@@ -22,6 +29,13 @@ function formatLastSeen(iso) {
 export default function DeviceCard({ device, onOpen, launchEnabled, onToast }) {
   const status = device.online_status
   const displayName = device.nickname || device.alias_from_rustdesk || device.hostname || device.rustdesk_id || 'Unnamed device'
+  const connectUrl = rustdeskConnectUrl(device.rustdesk_id)
+  const handleConnect = () => {
+    if (!connectUrl) return
+    // Use window.location.href rather than an anchor tag so the browser
+    // actually hands the URL off to the OS protocol handler in every browser.
+    try { window.location.href = connectUrl } catch {}
+  }
   return (
     <div className="device-card">
       <div className="nickname">
@@ -43,6 +57,21 @@ export default function DeviceCard({ device, onOpen, launchEnabled, onToast }) {
         )}
       </div>
       <div className="actions">
+        <button
+          type="button"
+          className="btn small primary"
+          onClick={handleConnect}
+          disabled={!device.rustdesk_id}
+          title={device.rustdesk_id ? `Open RustDesk and connect to ${device.rustdesk_id}` : 'Invalid ID'}
+        >
+          Connect
+        </button>
+        <CopyButton
+          value={connectUrl}
+          label="Copy Link"
+          onCopied={() => onToast?.('Connect link copied')}
+          disabled={!device.rustdesk_id}
+        />
         <CopyButton
           value={device.rustdesk_id}
           label="Copy ID"
@@ -61,9 +90,11 @@ export default function DeviceCard({ device, onOpen, launchEnabled, onToast }) {
             className="btn small"
             disabled={!device.rustdesk_id}
             onClick={() => {
-              // Feature-flagged; uses a custom URL scheme the RustDesk client
-              // may register on some OSes. Will silently do nothing if the
-              // handler is not installed.
+              // Legacy feature-flagged launcher; uses the older `rustdesk://<id>`
+              // URL scheme. The dedicated "Connect" button above uses the
+              // verified `rustdesk://connection/new/<id>` scheme and should be
+              // preferred. Kept here so the flag-driven UX isn't silently
+              // broken for any existing deployments.
               try { window.location.href = `rustdesk://${encodeURIComponent(device.rustdesk_id)}` } catch {}
             }}
           >Launch</button>

@@ -25,8 +25,14 @@ exposes a clean internal-admin web UI.
   - **Setup** — light admin panel for CRUD + sync inspection.
 - Manual device creation, manual sync button, sync status panel,
   search, company filter, copy-to-clipboard, clean empty states.
-- Feature flag for a local-launch action (`rustdesk://<id>`). Off by
-  default.
+- **One-click Connect** — each device has a `Connect` button that
+  opens the locally installed RustDesk client and begins a new
+  connection via the `rustdesk://connection/new/<ID>` deep link.
+  Verified on Windows. A `Copy Link` button is provided for cases
+  where you want to paste the deep link into chat, a ticket, or
+  another tool.
+- Legacy feature flag for an older launch scheme (`rustdesk://<id>`).
+  Off by default and superseded by the Connect button above.
 
 ## Architecture
 
@@ -171,6 +177,38 @@ The scheduler enforces a minimum of 5 seconds.
 
 The adapter is the **only** place that should need to change. The
 rest of the app consumes a stable `DeviceRecord` dataclass.
+
+## Connect deep link
+
+Each device row (and the device detail drawer) exposes a **Connect**
+button that uses RustDesk's `rustdesk://` URL scheme to hand the ID
+off to the locally installed RustDesk client:
+
+```
+rustdesk://connection/new/<RustDesk-ID>
+```
+
+On Windows the RustDesk client registers a protocol handler at
+install time, and clicking Connect opens the client and starts a new
+session against the given peer. On platforms without the handler
+registered, clicking the button is a harmless no-op — no network
+traffic, no error — so it is safe to ship unconditionally.
+
+The companion button **Copy Link** copies the exact same URL to the
+clipboard so you can paste it into a Slack/Teams/ticket/email and the
+other end can click to connect directly.
+
+Notes:
+
+- This is a pure front-end feature. The backend is not involved and
+  has no knowledge of connection attempts.
+- The button is disabled for devices that do not have a RustDesk ID
+  (e.g. a manually-created placeholder row).
+- The `LAUNCH_RUSTDESK_ENABLED` env var controls a separate, older
+  launcher that uses the `rustdesk://<ID>` scheme (without the
+  `connection/new/` path). It is off by default and kept only for
+  backwards compatibility with earlier deployments. New users should
+  use Connect.
 
 ## API surface
 
