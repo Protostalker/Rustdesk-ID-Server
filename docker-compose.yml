@@ -1,0 +1,46 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: rdac-backend
+    restart: unless-stopped
+    environment:
+      APP_DB_PATH: ${APP_DB_PATH:-/data/companion.sqlite3}
+      RUSTDESK_DATA_DIR: ${RUSTDESK_DATA_DIR:-/rustdesk-data}
+      RUSTDESK_DB_FILENAME: ${RUSTDESK_DB_FILENAME:-db_v2.sqlite3}
+      SYNC_INTERVAL_SECONDS: ${SYNC_INTERVAL_SECONDS:-60}
+      LAUNCH_RUSTDESK_ENABLED: ${LAUNCH_RUSTDESK_ENABLED:-false}
+      CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-*}
+      # Live presence polling via hbbs rendezvous protocol (NAT-test TCP port,
+      # = main RustDesk port - 1, default 21115). Set HBBS_HOST="" to disable.
+      HBBS_HOST: ${HBBS_HOST:-host.docker.internal}
+      HBBS_PORT: ${HBBS_PORT:-21115}
+      PRESENCE_INTERVAL_SECONDS: ${PRESENCE_INTERVAL_SECONDS:-20}
+      PRESENCE_TIMEOUT_SECONDS: ${PRESENCE_TIMEOUT_SECONDS:-5.0}
+    extra_hosts:
+      # Makes host.docker.internal resolve to the Docker host on Linux.
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # App database lives in a named volume (persistent).
+      - rdac_data:/data
+      # READ-ONLY mount of the RustDesk OSS server data directory.
+      # Change the host path to wherever your hbbs/hbbr data lives.
+      - ${RUSTDESK_HOST_DATA_DIR:-./rustdesk-data}:/rustdesk-data:ro
+    expose:
+      - "8000"
+    # Uncomment to expose the backend directly on the host for debugging:
+    # ports:
+    #   - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: rdac-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  rdac_data:

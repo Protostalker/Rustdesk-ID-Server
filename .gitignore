@@ -1,0 +1,28 @@
+# Env
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.eggs/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# App DB (should live in the docker volume, but catch stray local copies)
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Editors
+.idea/
+.vscode/
+.DS_Store
