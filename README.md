@@ -100,6 +100,7 @@ If the schema changes or the heuristic does not find a table:
    ```bash
    cp .env.example .env
    # Edit .env and set RUSTDESK_HOST_DATA_DIR to your RustDesk OSS
+   # POINT IT TO YOUR SQLITE DIRECTORY AND NOT THE SQLITE FILE DIRECTLY.
    # server data directory.
    ```
 
